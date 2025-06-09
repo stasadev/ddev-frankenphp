@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+#ddev-generated
+## Description: Run php inside the frankenphp container
+## Usage: php [flags] [args]
+## Example: "ddev php --version"
+## ExecRaw: true
+## MutagenSync: true
+
+php "$@"

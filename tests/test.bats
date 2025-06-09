@@ -32,24 +32,51 @@ setup() {
   export DDEV_NO_INSTRUMENTATION=true
   ddev delete -Oy "${PROJNAME}" >/dev/null 2>&1 || true
   cd "${TESTDIR}"
-  run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site
+
+  run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site --webserver-type=generic
   assert_success
+
+  mkdir -p public
+  echo '<?php echo "FrankenPHP DDEV page";' > public/index.php
+
   run ddev start -y
   assert_success
 }
 
 health_checks() {
-  # Do something useful here that verifies the add-on
+  run curl -sfI http://${PROJNAME}.ddev.site
+  assert_output --partial "HTTP/1.1 200"
+  assert_output --partial "Server: Caddy"
+  assert_output --partial "X-Powered-By: PHP/8.3"
 
-  # You can check for specific information in headers:
-  # run curl -sfI https://${PROJNAME}.ddev.site
-  # assert_output --partial "HTTP/2 200"
-  # assert_output --partial "test_header"
+  run curl -sfI https://${PROJNAME}.ddev.site
+  assert_output --partial "HTTP/2 200"
+  assert_output --partial "server: Caddy"
+  assert_output --partial "x-powered-by: PHP/8.3"
 
-  # Or check if some command gives expected output:
-  DDEV_DEBUG=true run ddev launch
+  run curl -sf http://${PROJNAME}.ddev.site
+  assert_output "FrankenPHP DDEV page"
+
+  run curl -sf https://${PROJNAME}.ddev.site
+  assert_output "FrankenPHP DDEV page"
+
+  run ddev help php
   assert_success
-  assert_output --partial "FULLURL https://${PROJNAME}.ddev.site"
+  assert_output --partial "frankenphp"
+
+  run ddev php -v
+  assert_success
+  assert_output --partial "PHP 8.3"
+
+  run ddev php --ini
+  assert_success
+  assert_output --partial "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+  assert_output --partial "/usr/local/etc/php/conf.d/docker-php-ext-opcache.ini"
+
+  run ddev php -m
+  assert_success
+  assert_output --partial "Xdebug"
+  assert_output --partial "Zend OPcache"
 }
 
 teardown() {

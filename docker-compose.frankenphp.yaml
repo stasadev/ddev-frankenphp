@@ -1,16 +1,43 @@
 #ddev-generated
-# Simple template to demonstrate frankenphp
 services:
   frankenphp:
     container_name: ddev-${DDEV_SITENAME}-frankenphp
-    image: ${FRANKENPHP_DOCKER_IMAGE:-busybox:stable}
-    command: tail -f /dev/null
-    restart: "no"
-    # These labels ensure this service is discoverable by DDEV.
+    build:
+      dockerfile_inline: |
+        ARG FRANKENPHP_DOCKER_IMAGE=scratch
+        FROM $${FRANKENPHP_DOCKER_IMAGE}
+        ARG FRANKENPHP_PHP_EXTENSIONS=""
+        RUN [ -z "$${FRANKENPHP_PHP_EXTENSIONS}" ] || install-php-extensions $${FRANKENPHP_PHP_EXTENSIONS}
+        ARG FRANKENPHP_USER=ddev
+        ARG DDEV_UID
+        ARG DDEV_GID
+        RUN <<EOF
+          set -eu
+          groupadd -g $${DDEV_GID} $${FRANKENPHP_USER}
+          useradd -u $${DDEV_UID} -g $${DDEV_GID} $${FRANKENPHP_USER}
+          setcap -r /usr/local/bin/frankenphp
+          chown -R $${FRANKENPHP_USER}:$${FRANKENPHP_USER} /data/caddy /config/caddy
+        EOF
+        USER $${FRANKENPHP_USER}
+      args:
+        FRANKENPHP_DOCKER_IMAGE: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}
+        FRANKENPHP_PHP_EXTENSIONS: ${FRANKENPHP_PHP_EXTENSIONS:-opcache xdebug}
+        DDEV_UID: ${DDEV_UID}
+        DDEV_GID: ${DDEV_GID}
     labels:
       com.ddev.site-name: ${DDEV_SITENAME}
       com.ddev.approot: ${DDEV_APPROOT}
-
+    environment:
+      - SERVER_NAME=:8000
+      - VIRTUAL_HOST=${DDEV_HOSTNAME}
+      - HTTP_EXPOSE=80:8000
+      - HTTPS_EXPOSE=443:8000
     volumes:
+      - "../:/app"
+      - "./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile"
+      - "./php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
       - ".:/mnt/ddev_config"
       - "ddev-global-cache:/mnt/ddev-global-cache"
+    # Two lines below are for Xdebug on Linux, see README.md for details
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
