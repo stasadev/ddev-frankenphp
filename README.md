@@ -63,7 +63,7 @@ Make sure to commit the `.ddev/.env.frankenphp` file to version control.
 To add PHP extensions (see supported extensions [here](https://github.com/mlocati/docker-php-extension-installer?tab=readme-ov-file#supported-php-extensions):
 
 ```bash
-ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="opcache xdebug"
+ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="opcache xdebug spx"
 ddev add-on get stasadev/ddev-frankenphp
 ddev stop && ddev debug rebuild -s frankenphp && ddev start
 ```
