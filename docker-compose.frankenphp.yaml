@@ -1,9 +1,9 @@
 #ddev-generated
-# Simple template to demonstrate addon-template
+# Simple template to demonstrate frankenphp
 services:
-  addon-template:
-    container_name: ddev-${DDEV_SITENAME}-addon-template
-    image: ${ADDON_TEMPLATE_DOCKER_IMAGE:-busybox:stable}
+  frankenphp:
+    container_name: ddev-${DDEV_SITENAME}-frankenphp
+    image: ${FRANKENPHP_DOCKER_IMAGE:-busybox:stable}
     command: tail -f /dev/null
     restart: "no"
     # These labels ensure this service is discoverable by DDEV.
