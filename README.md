@@ -38,7 +38,7 @@ To change the `docroot` from the default `public` directory to something else, r
 
 ## Caveats
 
-- To make Xdebug available on the host, create a `.ddev/docker-compose.frankenphp_extra.yaml` file, and replace `IP_ADDRESS` with the IP from `ddev exec ping -c1 host.docker.internal`. If you're on Linux, use `host-gateway` instead of `IP_ADDRESS`:
+- To make Xdebug available on the host, create a `.ddev/docker-compose.frankenphp_extra.yaml` file, and replace `IP_ADDRESS` with the IP from `ddev exec ping -c1 host.docker.internal`. If you're on Linux (including WSL2), use `host-gateway` instead of `IP_ADDRESS`:
     ```yaml
     services:
       frankenphp:
