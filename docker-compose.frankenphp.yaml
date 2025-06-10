@@ -32,8 +32,9 @@ services:
       - VIRTUAL_HOST=${DDEV_HOSTNAME}
       - HTTP_EXPOSE=80:8000
       - HTTPS_EXPOSE=443:8000
+    working_dir: /var/www/html
     volumes:
-      - "../:/app"
+      - "../:/var/www/html"
       - "./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile"
       - "./php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
       - ".:/mnt/ddev_config"
