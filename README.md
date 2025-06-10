@@ -45,20 +45,6 @@ To change the `docroot` from the default `public` directory to something else, r
         extra_hosts:
           - "host.docker.internal:IP_ADDRESS"
     ```
-If using VS Code, create a launch.json config such as this (`/app/public`, is the path within the Frankenphp Docker container where the app files go - as opposed to `/var/www/html` in the DDEV web container).
-
-```json
-{
-    "name": "Listen for Xdebug",
-    "type": "php",
-    "request": "launch",
-    "port": 9003,
-    "pathMappings": {
-        "/app/public": "${workspaceFolder}/public"
-    }
-},
-```
-
 - `ddev xdebug` is only designed to work in the `web` container, it won't work here.
 - `ddev launch` doesn't work. Open the website URL directly in your browser.
 
