@@ -34,7 +34,15 @@ After installation, make sure to commit the `.ddev` directory to version control
 
 ## Caveats
 
-- To make Xdebug available on the host, create a `.ddev/docker-compose.frankenphp_extra.yaml` file, and replace `IP_ADDRESS` with the IP from `ddev exec ping -c1 host.docker.internal`. If you're on Linux (including WSL2), use `host-gateway` instead of `IP_ADDRESS`:
+- To make Xdebug available on the host, create a `.ddev/docker-compose.frankenphp_extra.yaml` file:
+  - For Linux and WSL2:
+    ```yaml
+    services:
+      frankenphp:
+        extra_hosts:
+          - "host.docker.internal:host-gateway"
+    ```
+  - For other setups, replace `IP_ADDRESS` with IP from the `ddev exec ping -c1 host.docker.internal` command:
     ```yaml
     services:
       frankenphp:
@@ -56,7 +64,7 @@ ddev stop && ddev debug rebuild -s frankenphp && ddev start
 
 Make sure to commit the `.ddev/.env.frankenphp` file to version control.
 
-To add PHP extensions (see supported extensions [here](https://github.com/mlocati/docker-php-extension-installer?tab=readme-ov-file#supported-php-extensions):
+To add PHP extensions (see supported extensions [here](https://github.com/mlocati/docker-php-extension-installer?tab=readme-ov-file#supported-php-extensions)):
 
 ```bash
 ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="opcache xdebug spx"

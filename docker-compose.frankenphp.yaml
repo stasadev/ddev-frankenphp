@@ -9,6 +9,8 @@ services:
         FROM $${FRANKENPHP_DOCKER_IMAGE}
         ARG FRANKENPHP_PHP_EXTENSIONS=""
         RUN [ -z "$${FRANKENPHP_PHP_EXTENSIONS}" ] || install-php-extensions $${FRANKENPHP_PHP_EXTENSIONS}
+        # Load Xdebug from /usr/local/etc/php/conf.d/ddev-xdebug.ini instead
+        RUN rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
         ARG FRANKENPHP_USER=ddev
         ARG DDEV_UID
         ARG DDEV_GID
