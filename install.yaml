@@ -4,7 +4,6 @@ project_files:
   - commands/frankenphp/php
   - docker-compose.frankenphp.yaml
   - frankenphp/Caddyfile
-  - php/docker-php-ext-xdebug.ini
 
 pre_install_actions:
   - |
@@ -14,5 +13,16 @@ pre_install_actions:
     echo "Run 'ddev config --webserver-type=generic' and repeat this command again."
     exit 1
     {{ end }}
+  - |
+    #ddev-description:Removing old files
+    file="${DDEV_APPROOT}/.ddev/php/docker-php-ext-xdebug.ini"
+    if [ -f "${file}" ]; then
+      if grep -q '#ddev-generated' "${file}"; then
+        rm -f "${file}"
+      else
+        echo "${file} needs to be removed but has been modified by the user. Please check it and remove it"
+        exit 2
+      fi
+    fi
 
 ddev_version_constraint: '>= v1.24.3'
