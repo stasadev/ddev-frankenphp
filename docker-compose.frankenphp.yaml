@@ -30,6 +30,7 @@ services:
       com.ddev.approot: ${DDEV_APPROOT}
     environment:
       - SERVER_NAME=:8000
+      - PHP_INI_SCAN_DIR=:/usr/local/etc/php/ddev.conf.d
       - VIRTUAL_HOST=${DDEV_HOSTNAME}
       - HTTP_EXPOSE=80:8000
       - HTTPS_EXPOSE=443:8000
@@ -37,7 +38,7 @@ services:
     volumes:
       - "../:/var/www/html"
       - "./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile"
-      - "./php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+      - "./php:/usr/local/etc/php/ddev.conf.d"
       - ".:/mnt/ddev_config"
       - "ddev-global-cache:/mnt/ddev-global-cache"
     # Two lines below are for Xdebug on Linux, see README.md for details
