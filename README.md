@@ -33,7 +33,7 @@ To change the `docroot` from the default `public` directory to something else, r
 | ------- | ----------- |
 | `ddev describe` | View service status and ports used by FrankenPHP |
 | `ddev php` | Run PHP in the FrankenPHP container |
-| `ddev exec -s frankenphp -- bash` | Enter the FrankenPHP container |
+| `ddev exec -s frankenphp bash` | Enter the FrankenPHP container |
 | `ddev logs -s frankenphp -f` | View FrankenPHP logs |
 
 ## Caveats
