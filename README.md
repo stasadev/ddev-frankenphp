@@ -45,7 +45,7 @@ To change the `docroot` from the default `public` directory to something else, r
         extra_hosts:
           - "host.docker.internal:IP_ADDRESS"
     ```
-If using VS Code, create a launch.json config such as this (`/app/public`, is the path within the Frankenphp Docker container where the app files go - as opposed to `/var/www/html` in the ddev web container).
+If using VS Code, create a launch.json config such as this (`/app/public`, is the path within the Frankenphp Docker container where the app files go - as opposed to `/var/www/html` in the DDEV web container).
 
 ```json
 {
