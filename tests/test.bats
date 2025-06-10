@@ -36,14 +36,16 @@ setup() {
   run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site --webserver-type=generic
   assert_success
 
-  mkdir -p public
-  echo '<?php echo "FrankenPHP DDEV page";' > public/index.php
-
   run ddev start -y
   assert_success
 }
 
 health_checks() {
+  run ddev exec -s frankenphp curl -sfI http://127.0.0.1:8000
+  assert_output --partial "HTTP/1.1 200"
+  assert_output --partial "Server: Caddy"
+  assert_output --partial "X-Powered-By: PHP/8.3"
+
   run curl -sfI http://${PROJNAME}.ddev.site
   assert_output --partial "HTTP/1.1 200"
   assert_output --partial "Server: Caddy"
@@ -53,6 +55,9 @@ health_checks() {
   assert_output --partial "HTTP/2 200"
   assert_output --partial "server: Caddy"
   assert_output --partial "x-powered-by: PHP/8.3"
+
+  run ddev exec -s frankenphp curl -sf http://127.0.0.1:8000
+  assert_output "FrankenPHP DDEV page"
 
   run curl -sf http://${PROJNAME}.ddev.site
   assert_output "FrankenPHP DDEV page"
@@ -87,6 +92,41 @@ teardown() {
 
 @test "install from directory" {
   set -eu -o pipefail
+
+  echo '<?php echo "FrankenPHP DDEV page";' >index.php
+  assert_file_exist index.php
+  assert_file_not_exist public/index.php
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_success
+  run ddev restart -y
+  assert_success
+  health_checks
+}
+
+@test "install from directory wrong webserver" {
+  set -eu -o pipefail
+
+  run ddev config --webserver-type=nginx-fpm
+  assert_success
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_failure
+  assert_output --partial "The add-on only works with the 'generic' webserver type."
+}
+
+@test "install from directory docroot=public" {
+  set -eu -o pipefail
+
+  run ddev config --docroot=public
+  assert_success
+
+  echo '<?php echo "FrankenPHP DDEV page";' >public/index.php
+  assert_file_not_exist index.php
+  assert_file_exist public/index.php
+
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
   assert_success
@@ -98,6 +138,11 @@ teardown() {
 # bats test_tags=release
 @test "install from release" {
   set -eu -o pipefail
+
+  echo '<?php echo "FrankenPHP DDEV page";' >index.php
+  assert_file_exist index.php
+  assert_file_not_exist public/index.php
+
   echo "# ddev add-on get ${GITHUB_REPO} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${GITHUB_REPO}"
   assert_success

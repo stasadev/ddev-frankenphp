@@ -23,10 +23,6 @@ ddev restart
 
 After installation, make sure to commit the `.ddev` directory to version control.
 
-### Using a different docroot
-
-To change the `docroot` from the default `public` directory to something else, remove the `#ddev-generated` line from the`.ddev/frankenphp/Caddyfile` and update the `root public/` line.
-
 ## Usage
 
 | Command | Description |
