@@ -75,7 +75,8 @@ health_checks() {
 
   run ddev php --ini
   assert_success
-  assert_output --partial "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
+  assert_output --partial "/usr/local/etc/php/conf.d/ddev-xdebug.ini"
+  refute_output --partial "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
   assert_output --partial "/usr/local/etc/php/conf.d/docker-php-ext-opcache.ini"
 
   run ddev php -m
