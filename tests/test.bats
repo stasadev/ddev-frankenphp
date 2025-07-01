@@ -38,6 +38,8 @@ setup() {
 
   run ddev start -y
   assert_success
+
+  export INSTALL_OPCACHE=false
 }
 
 health_checks() {
@@ -75,14 +77,15 @@ health_checks() {
 
   run ddev php --ini
   assert_success
-  assert_output --partial "/usr/local/etc/php/conf.d/ddev-xdebug.ini"
-  refute_output --partial "/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
-  assert_output --partial "/usr/local/etc/php/conf.d/docker-php-ext-opcache.ini"
+  assert_output --partial "/usr/local/etc/php/ddev.conf.d"
 
   run ddev php -m
   assert_success
-  assert_output --partial "Xdebug"
-  assert_output --partial "Zend OPcache"
+  if [ "${INSTALL_OPCACHE}" = "true" ]; then
+    assert_output --partial "Zend OPcache"
+  else
+    refute_output --partial "Zend OPcache"
+  fi
 }
 
 teardown() {
@@ -118,11 +121,17 @@ teardown() {
   assert_output --partial "The add-on only works with the 'generic' webserver type."
 }
 
-@test "install from directory docroot=public" {
+@test "install from directory docroot=public and install opcache" {
   set -eu -o pipefail
+
+  export INSTALL_OPCACHE=true
 
   run ddev config --docroot=public
   assert_success
+
+  run ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="opcache"
+  assert_success
+  assert_file_exist .ddev/.env.frankenphp
 
   echo '<?php echo "FrankenPHP DDEV page";' >public/index.php
   assert_file_not_exist index.php

@@ -34,22 +34,7 @@ After installation, make sure to commit the `.ddev` directory to version control
 
 ## Caveats
 
-- To make Xdebug available on the host, create a `.ddev/docker-compose.frankenphp_extra.yaml` file:
-  - For Linux and WSL2:
-    ```yaml
-    services:
-      frankenphp:
-        extra_hosts:
-          - "host.docker.internal:host-gateway"
-    ```
-  - For other setups, replace `IP_ADDRESS` with IP from the `ddev exec ping -c1 host.docker.internal` command:
-    ```yaml
-    services:
-      frankenphp:
-        extra_hosts:
-          - "host.docker.internal:IP_ADDRESS"
-    ```
-- `ddev xdebug` is only designed to work in the `web` container, it won't work here.
+- `ddev xdebug` and `ddev xhprof` are only designed to work in the `web` container, it won't work here.
 - `ddev launch` doesn't work. Open the website URL directly in your browser.
 
 ## Advanced Customization
@@ -67,19 +52,38 @@ Make sure to commit the `.ddev/.env.frankenphp` file to version control.
 To add PHP extensions (see supported extensions [here](https://github.com/mlocati/docker-php-extension-installer?tab=readme-ov-file#supported-php-extensions)):
 
 ```bash
-ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="opcache xdebug spx"
+ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="opcache spx"
 ddev add-on get stasadev/ddev-frankenphp
 ddev stop && ddev debug rebuild -s frankenphp && ddev start
 ```
 
 Make sure to commit the `.ddev/.env.frankenphp` file to version control.
 
+To make Xdebug work for Linux and WSL2:
+
+```bash
+# Add xdebug to PHP extensions
+ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="xdebug"
+printf "services:\n  frankenphp:\n    extra_hosts:\n      - \"host.docker.internal:host-gateway\"\n" > .ddev/docker-compose.frankenphp_extra.yaml
+ddev stop && ddev debug rebuild -s frankenphp && ddev start
+```
+
+To make Xdebug work for other setups:
+
+```bash
+ddev start
+printf "services:\n  frankenphp:\n    extra_hosts:\n      - \"host.docker.internal:$(ddev exec "ping -c1 host.docker.internal | awk -F'[()]' '/PING/{print \$2}'")\"\n" > .ddev/docker-compose.frankenphp_extra.yaml
+# Add xdebug to PHP extensions
+ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="xdebug"
+ddev stop && ddev debug rebuild -s frankenphp && ddev start
+```
+
 All customization options (use with caution):
 
 | Variable | Flag | Default |
 | -------- | ---- | ------- |
 | `FRANKENPHP_DOCKER_IMAGE` | `--frankenphp-docker-image` | `dunglas/frankenphp:php8.3` |
-| `FRANKENPHP_PHP_EXTENSIONS` | `--frankenphp-php-extensions` | `opcache xdebug` |
+| `FRANKENPHP_PHP_EXTENSIONS` | `--frankenphp-php-extensions` | (not set) |
 
 ## Resources:
 
