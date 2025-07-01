@@ -9,8 +9,17 @@ services:
         FROM $${FRANKENPHP_DOCKER_IMAGE}
         ARG FRANKENPHP_PHP_EXTENSIONS=""
         RUN [ -z "$${FRANKENPHP_PHP_EXTENSIONS}" ] || install-php-extensions $${FRANKENPHP_PHP_EXTENSIONS}
-        # Load Xdebug from /usr/local/etc/php/conf.d/ddev-xdebug.ini instead
-        RUN rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        RUN sh -c 'case "$${FRANKENPHP_PHP_EXTENSIONS}" in *xdebug*) \
+          { \
+            echo "zend_extension=xdebug.so"; \
+            echo "xdebug.client_host=host.docker.internal"; \
+            echo "xdebug.discover_client_host=1"; \
+            echo "xdebug.client_port=9003"; \
+            echo "xdebug.mode=debug,develop"; \
+            echo "xdebug.start_with_request=yes"; \
+            echo "xdebug.max_nesting_level=1000"; \
+          } > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+        esac'
         ARG FRANKENPHP_USER=ddev
         ARG DDEV_UID
         ARG DDEV_GID
@@ -24,7 +33,7 @@ services:
         USER $${FRANKENPHP_USER}
       args:
         FRANKENPHP_DOCKER_IMAGE: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}
-        FRANKENPHP_PHP_EXTENSIONS: ${FRANKENPHP_PHP_EXTENSIONS:-opcache xdebug}
+        FRANKENPHP_PHP_EXTENSIONS: ${FRANKENPHP_PHP_EXTENSIONS:-}
         DDEV_UID: ${DDEV_UID}
         DDEV_GID: ${DDEV_GID}
     labels:
@@ -36,6 +45,7 @@ services:
       - VIRTUAL_HOST=${DDEV_HOSTNAME}
       - HTTP_EXPOSE=80:8000
       - HTTPS_EXPOSE=443:8000
+      - PHP_IDE_CONFIG=serverName=${DDEV_SITENAME}.${DDEV_TLD}
     working_dir: /var/www/html
     volumes:
       - "../:/var/www/html"
@@ -46,18 +56,3 @@ services:
     # Two lines below are for Xdebug on Linux, see README.md for details
     # extra_hosts:
     #   - "host.docker.internal:host-gateway"
-    configs:
-      - source: ddev-xdebug.ini
-        target: /usr/local/etc/php/conf.d/ddev-xdebug.ini
-        mode: "0444"
-
-configs:
-  ddev-xdebug.ini:
-    content: |
-      zend_extension=xdebug.so
-      xdebug.client_host=host.docker.internal
-      xdebug.discover_client_host=1
-      xdebug.client_port=9003
-      xdebug.mode=debug,develop
-      xdebug.start_with_request=yes
-      xdebug.max_nesting_level=1000
