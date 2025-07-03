@@ -39,7 +39,7 @@ setup() {
   run ddev start -y
   assert_success
 
-  export INSTALL_OPCACHE=false
+  export INSTALL_REDIS=false
 }
 
 health_checks() {
@@ -81,10 +81,10 @@ health_checks() {
 
   run ddev php -m
   assert_success
-  if [ "${INSTALL_OPCACHE}" = "true" ]; then
-    assert_output --partial "Zend OPcache"
+  if [ "${INSTALL_REDIS}" = "true" ]; then
+    assert_output --partial "redis"
   else
-    refute_output --partial "Zend OPcache"
+    refute_output --partial "redis"
   fi
 }
 
@@ -121,15 +121,15 @@ teardown() {
   assert_output --partial "The add-on only works with the 'generic' webserver type."
 }
 
-@test "install from directory docroot=public and install opcache" {
+@test "install from directory docroot=public and install redis" {
   set -eu -o pipefail
 
-  export INSTALL_OPCACHE=true
+  export INSTALL_REDIS=true
 
   run ddev config --docroot=public
   assert_success
 
-  run ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="opcache"
+  run ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="redis"
   assert_success
   assert_file_exist .ddev/.env.frankenphp
 
