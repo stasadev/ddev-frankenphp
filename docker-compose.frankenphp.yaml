@@ -3,6 +3,7 @@ services:
   frankenphp:
     container_name: ddev-${DDEV_SITENAME}-frankenphp
     hostname: ${DDEV_SITENAME}-frankenphp
+    image: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}-${DDEV_SITENAME}-built
     build:
       dockerfile_inline: |
         ARG FRANKENPHP_DOCKER_IMAGE=scratch
