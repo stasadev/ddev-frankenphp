@@ -40,6 +40,7 @@ setup() {
   assert_success
 
   export INSTALL_REDIS=false
+  export FRANKENPHP_WORKER=false
 }
 
 health_checks() {
@@ -51,11 +52,19 @@ health_checks() {
   assert_success
   assert_output "$(whoami)"
 
-  run ddev exec -s frankenphp curl -sfI http://127.0.0.1:8000
+  run ddev exec -s frankenphp curl -sfI http://127.0.0.1
   assert_success
   assert_output --partial "HTTP/1.1 200"
   assert_output --partial "Server: Caddy"
   assert_output --partial "X-Powered-By: PHP/8.3"
+
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial "X-Request-Count"
+    assert_output --partial "X-Worker-Uptime"
+  else
+    refute_output --partial "X-Request-Count"
+    refute_output --partial "X-Worker-Uptime"
+  fi
 
   run curl -sfI http://${PROJNAME}.ddev.site
   assert_success
@@ -63,23 +72,64 @@ health_checks() {
   assert_output --partial "Server: Caddy"
   assert_output --partial "X-Powered-By: PHP/8.3"
 
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial "X-Request-Count"
+    assert_output --partial "X-Worker-Uptime"
+  else
+    refute_output --partial "X-Request-Count"
+    refute_output --partial "X-Worker-Uptime"
+  fi
+
   run curl -sfI https://${PROJNAME}.ddev.site
   assert_success
   assert_output --partial "HTTP/2 200"
   assert_output --partial "server: Caddy"
   assert_output --partial "x-powered-by: PHP/8.3"
 
-  run ddev exec -s frankenphp curl -sf http://127.0.0.1:8000
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial "x-request-count"
+    assert_output --partial "x-worker-uptime"
+  else
+    refute_output --partial "x-request-count"
+    refute_output --partial "x-worker-uptime"
+  fi
+
+  run ddev exec -s frankenphp curl -sf http://127.0.0.1
   assert_success
-  assert_output "FrankenPHP DDEV page"
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial "FrankenPHP Worker Demo"
+  else
+    assert_output "FrankenPHP page without worker"
+  fi
 
   run curl -sf http://${PROJNAME}.ddev.site
   assert_success
-  assert_output "FrankenPHP DDEV page"
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial "FrankenPHP Worker Demo"
+  else
+    assert_output "FrankenPHP page without worker"
+  fi
 
   run curl -sf https://${PROJNAME}.ddev.site
   assert_success
-  assert_output "FrankenPHP DDEV page"
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial "FrankenPHP Worker Demo"
+  else
+    assert_output "FrankenPHP page without worker"
+  fi
+
+  run ddev exec -s frankenphp curl -sf http://127.0.0.1:2019/config/
+  assert_success
+  assert_output --partial '"listen":[":80"]'
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial '"workers"'
+    assert_output --partial '"max_execution_time":"15"'
+    assert_output --partial '"memory_limit":"256M"'
+  else
+    refute_output --partial '"workers"'
+    refute_output --partial '"max_execution_time":"15"'
+    refute_output --partial '"memory_limit":"256M"'
+  fi
 
   run ddev help php
   assert_success
@@ -111,9 +161,8 @@ teardown() {
 @test "install from directory" {
   set -eu -o pipefail
 
-  echo '<?php echo "FrankenPHP DDEV page";' >index.php
+  cp "${DIR}"/tests/testdata/index-no-worker.php index.php
   assert_file_exist index.php
-  assert_file_not_exist public/index.php
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
@@ -123,7 +172,26 @@ teardown() {
   health_checks
 }
 
-@test "install from directory wrong webserver" {
+@test "worker" {
+  set -eu -o pipefail
+
+  export FRANKENPHP_WORKER=true
+
+  cp "${DIR}"/tests/testdata/index-worker.php index.php
+  assert_file_exist index.php
+
+  cp "${DIR}"/tests/testdata/docker-compose.frankenphp_extra.yaml .ddev/docker-compose.frankenphp_extra.yaml
+  assert_file_exist .ddev/docker-compose.frankenphp_extra.yaml
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_success
+  run ddev restart -y
+  assert_success
+  health_checks
+}
+
+@test "wrong webserver" {
   set -eu -o pipefail
 
   run ddev config --webserver-type=nginx-fpm
@@ -135,7 +203,7 @@ teardown() {
   assert_output --partial "The add-on only works with the 'generic' webserver type."
 }
 
-@test "install from directory docroot=public and install redis" {
+@test "docroot=public and install redis" {
   set -eu -o pipefail
 
   export INSTALL_REDIS=true
@@ -147,8 +215,7 @@ teardown() {
   assert_success
   assert_file_exist .ddev/.env.frankenphp
 
-  echo '<?php echo "FrankenPHP DDEV page";' >public/index.php
-  assert_file_not_exist index.php
+  cp "${DIR}"/tests/testdata/index-no-worker.php public/index.php
   assert_file_exist public/index.php
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
@@ -163,9 +230,8 @@ teardown() {
 @test "install from release" {
   set -eu -o pipefail
 
-  echo '<?php echo "FrankenPHP DDEV page";' >index.php
+  cp "${DIR}"/tests/testdata/index-no-worker.php index.php
   assert_file_exist index.php
-  assert_file_not_exist public/index.php
 
   echo "# ddev add-on get ${GITHUB_REPO} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${GITHUB_REPO}"

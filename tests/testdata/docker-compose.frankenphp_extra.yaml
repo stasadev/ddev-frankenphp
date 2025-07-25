@@ -1,0 +1,18 @@
+# See all configurable variables in
+# https://github.com/php/frankenphp/blob/main/caddy/frankenphp/Caddyfile
+services:
+  frankenphp:
+    environment:
+      # enable worker script
+      # change some php.ini settings
+      FRANKENPHP_CONFIG: |
+        worker ${DDEV_DOCROOT:-.}/index.php
+        php_ini {
+          memory_limit 256M
+          max_execution_time 15
+        }
+      # add a stub for Mercure module
+      CADDY_SERVER_EXTRA_DIRECTIVES: |
+        # mercure {
+        #   ...
+        # }

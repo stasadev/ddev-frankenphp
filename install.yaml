@@ -3,7 +3,6 @@ name: frankenphp
 project_files:
   - commands/frankenphp/php
   - docker-compose.frankenphp.yaml
-  - frankenphp/Caddyfile
 
 pre_install_actions:
   - |
@@ -15,14 +14,15 @@ pre_install_actions:
     {{ end }}
   - |
     #ddev-description:Removing old files
-    file="${DDEV_APPROOT}/.ddev/php/docker-php-ext-xdebug.ini"
-    if [ -f "${file}" ]; then
-      if grep -q '#ddev-generated' "${file}"; then
-        rm -f "${file}"
-      else
-        echo "${file} needs to be removed but has been modified by the user. Please check it and remove it"
-        exit 2
+    for file in "${DDEV_APPROOT}/.ddev/php/docker-php-ext-xdebug.ini" "${DDEV_APPROOT}/.ddev/frankenphp/Caddyfile"; do
+      if [ -f "${file}" ]; then
+        if grep -q '#ddev-generated' "${file}"; then
+          rm -f "${file}"
+        else
+          echo "${file} needs to be removed but has been modified by the user. Please check it and remove it"
+          exit 2
+        fi
       fi
-    fi
+    done
 
 ddev_version_constraint: '>= v1.24.7'
