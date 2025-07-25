@@ -5,6 +5,8 @@
 
 # DDEV FrankenPHP
 
+See the blog [Using FrankenPHP with DDEV](https://ddev.com/blog/using-frankenphp-with-ddev/).
+
 ## Overview
 
 [FrankenPHP](https://frankenphp.dev/) is a modern application server for PHP built on top of the [Caddy](https://caddyserver.com/) web server.
@@ -63,7 +65,7 @@ Make sure to commit the `.ddev/.env.frankenphp` file to version control.
 
 ---
 
-To modify the default [Caddyfile](https://github.com/php/frankenphp/blob/main/caddy/frankenphp/Caddyfile) configuration, create a file [.ddev/docker-compose.frankenphp_extra.yaml](./tests/testdata/docker-compose.frankenphp_extra.yaml) with the following content:
+To modify the default [Caddyfile](https://github.com/php/frankenphp/blob/main/caddy/frankenphp/Caddyfile) configuration, create a file [`.ddev/docker-compose.frankenphp_extra.yaml`](./tests/testdata/docker-compose.frankenphp_extra.yaml) with the following content:
 
 ```yaml
 # See all configurable variables in
@@ -121,6 +123,8 @@ All customization options (use with caution):
 ## Resources:
 
 - [FrankenPHP Documentation](https://frankenphp.dev/docs/)
+- [Using FrankenPHP with DDEV](https://ddev.com/blog/using-frankenphp-with-ddev/)
+- [DDEV FrankenPHP Benchmark](https://github.com/stasadev/ddev-frankenphp-benchmark)
 
 ## Credits
 
