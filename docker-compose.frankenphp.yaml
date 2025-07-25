@@ -21,20 +21,21 @@ services:
             echo "xdebug.max_nesting_level=1000"; \
           } > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
         esac'
-        ARG FRANKENPHP_USER=ddev
+        ARG DDEV_USER
         ARG DDEV_UID
         ARG DDEV_GID
         RUN <<EOF
           set -eu
-          groupadd -g $${DDEV_GID} $${FRANKENPHP_USER}
-          useradd -u $${DDEV_UID} -g $${DDEV_GID} $${FRANKENPHP_USER}
+          groupadd -g $${DDEV_GID} $${DDEV_USER}
+          useradd -u $${DDEV_UID} -g $${DDEV_GID} $${DDEV_USER}
           setcap -r /usr/local/bin/frankenphp
-          chown -R $${FRANKENPHP_USER}:$${FRANKENPHP_USER} /data/caddy /config/caddy
+          chown -R $${DDEV_USER}:$${DDEV_USER} /data/caddy /config/caddy
         EOF
-        USER $${FRANKENPHP_USER}
+        USER $${DDEV_USER}
       args:
         FRANKENPHP_DOCKER_IMAGE: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}
         FRANKENPHP_PHP_EXTENSIONS: ${FRANKENPHP_PHP_EXTENSIONS:-}
+        DDEV_USER: ${DDEV_USER}
         DDEV_UID: ${DDEV_UID}
         DDEV_GID: ${DDEV_GID}
     labels:
@@ -43,6 +44,7 @@ services:
     environment:
       - PHP_INI_SCAN_DIR=:/usr/local/etc/php/ddev.conf.d
       - DDEV_DOCROOT=${DDEV_DOCROOT:-.}
+      - USER=${DDEV_USER}
       - VIRTUAL_HOST=${DDEV_HOSTNAME}
       - HTTP_EXPOSE=80:8000
       - HTTPS_EXPOSE=443:8000

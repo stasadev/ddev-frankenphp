@@ -43,28 +43,42 @@ setup() {
 }
 
 health_checks() {
+  run ddev exec -s frankenphp whoami
+  assert_success
+  assert_output "$(whoami)"
+
+  run ddev exec -s frankenphp bash -c 'echo $USER'
+  assert_success
+  assert_output "$(whoami)"
+
   run ddev exec -s frankenphp curl -sfI http://127.0.0.1:8000
+  assert_success
   assert_output --partial "HTTP/1.1 200"
   assert_output --partial "Server: Caddy"
   assert_output --partial "X-Powered-By: PHP/8.3"
 
   run curl -sfI http://${PROJNAME}.ddev.site
+  assert_success
   assert_output --partial "HTTP/1.1 200"
   assert_output --partial "Server: Caddy"
   assert_output --partial "X-Powered-By: PHP/8.3"
 
   run curl -sfI https://${PROJNAME}.ddev.site
+  assert_success
   assert_output --partial "HTTP/2 200"
   assert_output --partial "server: Caddy"
   assert_output --partial "x-powered-by: PHP/8.3"
 
   run ddev exec -s frankenphp curl -sf http://127.0.0.1:8000
+  assert_success
   assert_output "FrankenPHP DDEV page"
 
   run curl -sf http://${PROJNAME}.ddev.site
+  assert_success
   assert_output "FrankenPHP DDEV page"
 
   run curl -sf https://${PROJNAME}.ddev.site
+  assert_success
   assert_output "FrankenPHP DDEV page"
 
   run ddev help php
