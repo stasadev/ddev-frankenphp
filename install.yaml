@@ -25,4 +25,4 @@ pre_install_actions:
       fi
     fi
 
-ddev_version_constraint: '>= v1.24.3'
+ddev_version_constraint: '>= v1.24.7'
