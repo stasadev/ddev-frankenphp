@@ -43,16 +43,16 @@ services:
       com.ddev.approot: ${DDEV_APPROOT}
     environment:
       - PHP_INI_SCAN_DIR=:/usr/local/etc/php/ddev.conf.d
-      - DDEV_DOCROOT=${DDEV_DOCROOT:-.}
+      - SERVER_NAME=:80
+      - SERVER_ROOT=${DDEV_DOCROOT:-.}
       - USER=${DDEV_USER}
       - VIRTUAL_HOST=${DDEV_HOSTNAME}
-      - HTTP_EXPOSE=80:8000
-      - HTTPS_EXPOSE=443:8000
+      - HTTP_EXPOSE=80:80
+      - HTTPS_EXPOSE=443:80
       - PHP_IDE_CONFIG=serverName=${DDEV_SITENAME}.${DDEV_TLD}
     working_dir: /var/www/html
     volumes:
       - "../:/var/www/html"
-      - "./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile.d/ddev.caddyfile"
       - "./php:/usr/local/etc/php/ddev.conf.d"
       - ".:/mnt/ddev_config"
       - "ddev-global-cache:/mnt/ddev-global-cache"

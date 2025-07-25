@@ -49,6 +49,8 @@ ddev stop && ddev debug rebuild -s frankenphp && ddev start
 
 Make sure to commit the `.ddev/.env.frankenphp` file to version control.
 
+---
+
 To add PHP extensions (see supported extensions [here](https://github.com/mlocati/docker-php-extension-installer?tab=readme-ov-file#supported-php-extensions)):
 
 ```bash
@@ -59,6 +61,33 @@ ddev stop && ddev debug rebuild -s frankenphp && ddev start
 
 Make sure to commit the `.ddev/.env.frankenphp` file to version control.
 
+---
+
+To modify the default [Caddyfile](https://github.com/php/frankenphp/blob/main/caddy/frankenphp/Caddyfile) configuration, create a file [.ddev/docker-compose.frankenphp_extra.yaml](./tests/testdata/docker-compose.frankenphp_extra.yaml) with the following content:
+
+```yaml
+# See all configurable variables in
+# https://github.com/php/frankenphp/blob/main/caddy/frankenphp/Caddyfile
+services:
+  frankenphp:
+    environment:
+      # enable worker script
+      # change some php.ini settings
+      FRANKENPHP_CONFIG: |
+        worker ${DDEV_DOCROOT:-.}/index.php
+        php_ini {
+          memory_limit 256M
+          max_execution_time 15
+        }
+      # add a stub for Mercure module
+      CADDY_SERVER_EXTRA_DIRECTIVES: |
+        # mercure {
+        #   ...
+        # }
+```
+
+---
+
 To make Xdebug work for Linux and WSL2:
 
 ```bash
@@ -67,6 +96,8 @@ ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="xdebug"
 printf "services:\n  frankenphp:\n    extra_hosts:\n      - \"host.docker.internal:host-gateway\"\n" > .ddev/docker-compose.frankenphp_extra.yaml
 ddev stop && ddev debug rebuild -s frankenphp && ddev start
 ```
+
+---
 
 To make Xdebug work for other setups:
 
@@ -77,6 +108,8 @@ printf "services:\n  frankenphp:\n    extra_hosts:\n      - \"host.docker.intern
 ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="xdebug"
 ddev stop && ddev debug rebuild -s frankenphp && ddev start
 ```
+
+---
 
 All customization options (use with caution):
 
