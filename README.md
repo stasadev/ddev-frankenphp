@@ -113,11 +113,23 @@ ddev stop && ddev debug rebuild -s frankenphp && ddev start
 
 ---
 
+To set a specific HTTP port for FrankenPHP on localhost:
+
+```bash
+ddev dotenv set .ddev/.env.frankenphp --frankenphp-host-http-port=8080
+ddev restart
+```
+
+Make sure to commit the `.ddev/.env.frankenphp` file to version control.
+
+---
+
 All customization options (use with caution):
 
 | Variable | Flag | Default |
 | -------- | ---- | ------- |
 | `FRANKENPHP_DOCKER_IMAGE` | `--frankenphp-docker-image` | `dunglas/frankenphp:php8.3` |
+| `FRANKENPHP_HOST_HTTP_PORT` | `--frankenphp-host-http-port` | (random) |
 | `FRANKENPHP_PHP_EXTENSIONS` | `--frankenphp-php-extensions` | (not set) |
 
 ## Resources:

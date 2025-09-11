@@ -40,6 +40,7 @@ setup() {
   assert_success
 
   export INSTALL_REDIS=false
+  export HOST_HTTP_PORT=
   export FRANKENPHP_WORKER=false
 }
 
@@ -78,6 +79,13 @@ health_checks() {
   else
     refute_output --partial "X-Request-Count"
     refute_output --partial "X-Worker-Uptime"
+  fi
+
+  if [ "${HOST_HTTP_PORT}" != "" ]; then
+    run curl -sfI http://127.0.0.1:${HOST_HTTP_PORT}
+    assert_output --partial "HTTP/1.1 200"
+    assert_output --partial "Server: Caddy"
+    assert_output --partial "X-Powered-By: PHP/8.3"
   fi
 
   run curl -sfI https://${PROJNAME}.ddev.site
@@ -203,15 +211,16 @@ teardown() {
   assert_output --partial "The add-on only works with the 'generic' webserver type."
 }
 
-@test "docroot=public and install redis" {
+@test "docroot=public; customize: install redis, custom http port" {
   set -eu -o pipefail
 
   export INSTALL_REDIS=true
+  export HOST_HTTP_PORT=8080
 
   run ddev config --docroot=public
   assert_success
 
-  run ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="redis"
+  run ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="redis" --frankenphp-host-http-port="${HOST_HTTP_PORT}"
   assert_success
   assert_file_exist .ddev/.env.frankenphp
 

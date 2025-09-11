@@ -50,6 +50,9 @@ services:
       - HTTP_EXPOSE=80:80
       - HTTPS_EXPOSE=443:80
       - PHP_IDE_CONFIG=serverName=${DDEV_SITENAME}.${DDEV_TLD}
+    # direct access without ddev-router
+    ports:
+      - "${FRANKENPHP_HOST_HTTP_PORT:-}:80"
     working_dir: /var/www/html
     volumes:
       - "../:/var/www/html"
