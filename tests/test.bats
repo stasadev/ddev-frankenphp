@@ -41,6 +41,7 @@ setup() {
 
   export INSTALL_REDIS=false
   export FRANKENPHP_WORKER=false
+  export TEST_DDEV_XDEBUG=false
 }
 
 health_checks() {
@@ -150,6 +151,11 @@ health_checks() {
   else
     refute_output --partial "redis"
   fi
+  if [ "${TEST_DDEV_XDEBUG}" = "true" ]; then
+    assert_output --partial "xdebug"
+  else
+    refute_output --partial "xdebug"
+  fi
 }
 
 teardown() {
@@ -168,6 +174,22 @@ teardown() {
   run ddev add-on get "${DIR}"
   assert_success
   run ddev restart -y
+  assert_success
+  health_checks
+}
+
+@test "test ddev xdebug" {
+  set -eu -o pipefail
+
+  export TEST_DDEV_XDEBUG=true
+
+  cp "${DIR}"/tests/testdata/index-no-worker.php index.php
+  assert_file_exist index.php
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_success
+  run ddev xdebug
   assert_success
   health_checks
 }
