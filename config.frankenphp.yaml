@@ -1,0 +1,11 @@
+#ddev-generated
+webimage_extra_packages: [socat]
+web_extra_daemons:
+  - name: "frankenphp-socat"
+    command: "socat TCP-LISTEN:80,fork,reuseaddr TCP:frankenphp:80"
+    directory: /var/www/html
+web_extra_exposed_ports:
+  - name: "frankenphp-socat"
+    container_port: 80
+    http_port: 80
+    https_port: 443
