@@ -9,15 +9,11 @@
 ## AutocompleteTerms: ["on","off","enable","disable","toggle","status"]
 
 enable_xdebug() {
-  if [ "${DDEV_PROJECT_STATUS}" != "running" ]; then
-    FRANKENPHP_XDEBUG=true ddev start
-  else
-    FRANKENPHP_XDEBUG=true ddev debug rebuild -s frankenphp
-  fi
+  FRANKENPHP_XDEBUG=true ddev restart
 }
 
 disable_xdebug() {
-  ddev debug rebuild -s frankenphp
+  ddev restart
 }
 
 if [ $# -eq 0 ] ; then
