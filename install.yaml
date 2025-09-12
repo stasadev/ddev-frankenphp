@@ -3,6 +3,7 @@ name: frankenphp
 project_files:
   - config.frankenphp.yaml
   - commands/frankenphp/php
+  - commands/host/xdebug
   - docker-compose.frankenphp.yaml
 
 pre_install_actions:

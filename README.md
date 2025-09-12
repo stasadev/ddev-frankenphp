@@ -31,12 +31,14 @@ After installation, make sure to commit the `.ddev` directory to version control
 | ------- | ----------- |
 | `ddev describe` | View service status and ports used by FrankenPHP |
 | `ddev php` | Run PHP in the FrankenPHP container |
+| `ddev xdebug on` | Enable Xdebug in the FrankenPHP container |
+| `ddev xdebug off` | Disable Xdebug in the FrankenPHP container |
 | `ddev exec -s frankenphp bash` | Enter the FrankenPHP container |
 | `ddev logs -s frankenphp -f` | View FrankenPHP logs |
 
 ## Caveats
 
-- `ddev xdebug` and `ddev xhprof` are only designed to work in the `web` container, it won't work here.
+- `ddev xhprof` and `ddev xhgui` are only designed to work in the `web` container, it won't work here.
 
 ## Advanced Customization
 
@@ -85,16 +87,6 @@ services:
         # mercure {
         #   ...
         # }
-```
-
----
-
-To make Xdebug work:
-
-```bash
-# Add xdebug to PHP extensions
-ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="xdebug"
-ddev stop && ddev debug rebuild -s frankenphp && ddev start
 ```
 
 ---
