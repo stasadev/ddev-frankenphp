@@ -1,6 +1,7 @@
 name: frankenphp
 
 project_files:
+  - config.frankenphp.yaml
   - commands/frankenphp/php
   - docker-compose.frankenphp.yaml
 

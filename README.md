@@ -37,7 +37,6 @@ After installation, make sure to commit the `.ddev` directory to version control
 ## Caveats
 
 - `ddev xdebug` and `ddev xhprof` are only designed to work in the `web` container, it won't work here.
-- `ddev launch` doesn't work. Open the website URL directly in your browser.
 
 ## Advanced Customization
 
@@ -90,22 +89,9 @@ services:
 
 ---
 
-To make Xdebug work for Linux and WSL2:
+To make Xdebug work:
 
 ```bash
-# Add xdebug to PHP extensions
-ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="xdebug"
-printf "services:\n  frankenphp:\n    extra_hosts:\n      - \"host.docker.internal:host-gateway\"\n" > .ddev/docker-compose.frankenphp_extra.yaml
-ddev stop && ddev debug rebuild -s frankenphp && ddev start
-```
-
----
-
-To make Xdebug work for other setups:
-
-```bash
-ddev start
-printf "services:\n  frankenphp:\n    extra_hosts:\n      - \"host.docker.internal:$(ddev exec "ping -c1 host.docker.internal | awk -F'[()]' '/PING/{print \$2}'")\"\n" > .ddev/docker-compose.frankenphp_extra.yaml
 # Add xdebug to PHP extensions
 ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="xdebug"
 ddev stop && ddev debug rebuild -s frankenphp && ddev start
