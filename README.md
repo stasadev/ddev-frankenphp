@@ -13,7 +13,7 @@ See the blog [Using FrankenPHP with DDEV](https://ddev.com/blog/using-frankenphp
 
 This add-on integrates FrankenPHP into your [DDEV](https://ddev.com/) project as an extra service.
 
-Running it as a separate service lets you install additional PHP extensions. This differs from the [official quckstart](https://ddev.readthedocs.io/en/stable/users/quickstart/#generic-frankenphp) and [another add-on](https://github.com/ochorocho/ddev-frankenphp), which bundle a static FrankenPHP build inside the `web` container.
+Running it as a separate service lets you install additional PHP extensions. This differs from the [official quckstart](https://ddev.readthedocs.io/en/stable/users/quickstart/#generic-frankenphp), which bundles a static FrankenPHP build inside the `web` container.
 
 ## Installation
 
