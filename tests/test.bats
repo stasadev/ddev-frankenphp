@@ -42,6 +42,7 @@ setup() {
   export INSTALL_REDIS=false
   export FRANKENPHP_WORKER=false
   export TEST_DDEV_XDEBUG=false
+  export FRANKENPHP_PHP_VERSION="8.3"
 }
 
 health_checks() {
@@ -57,7 +58,7 @@ health_checks() {
   assert_success
   assert_output --partial "HTTP/1.1 200"
   assert_output --partial "Server: Caddy"
-  assert_output --partial "X-Powered-By: PHP/8.3"
+  assert_output --partial "X-Powered-By: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
     assert_output --partial "X-Request-Count"
@@ -71,7 +72,7 @@ health_checks() {
   assert_success
   assert_output --partial "HTTP/1.1 200"
   assert_output --partial "Server: Caddy"
-  assert_output --partial "X-Powered-By: PHP/8.3"
+  assert_output --partial "X-Powered-By: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
     assert_output --partial "X-Request-Count"
@@ -85,7 +86,7 @@ health_checks() {
   assert_success
   assert_output --partial "HTTP/2 200"
   assert_output --partial "server: Caddy"
-  assert_output --partial "x-powered-by: PHP/8.3"
+  assert_output --partial "x-powered-by: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
     assert_output --partial "x-request-count"
@@ -138,7 +139,7 @@ health_checks() {
 
   run ddev php -v
   assert_success
-  assert_output --partial "PHP 8.3"
+  assert_output --partial "PHP ${FRANKENPHP_PHP_VERSION}"
 
   run ddev php --ini
   assert_success
@@ -190,6 +191,26 @@ teardown() {
   run ddev add-on get "${DIR}"
   assert_success
   run ddev xdebug
+  assert_success
+  health_checks
+}
+
+@test "install from directory php8.4" {
+  set -eu -o pipefail
+
+  export FRANKENPHP_PHP_VERSION="8.4"
+
+  cp "${DIR}"/tests/testdata/index-no-worker.php index.php
+  assert_file_exist index.php
+
+  run ddev dotenv set .ddev/.env.frankenphp --frankenphp-docker-image="dunglas/frankenphp:php${FRANKENPHP_PHP_VERSION}"
+  assert_success
+  assert_file_exist .ddev/.env.frankenphp
+
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
+  run ddev add-on get "${DIR}"
+  assert_success
+  run ddev restart -y
   assert_success
   health_checks
 }

@@ -5,38 +5,7 @@ services:
     hostname: ${DDEV_SITENAME}-frankenphp
     image: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}-${DDEV_SITENAME}-built
     build:
-      dockerfile_inline: |
-        ARG FRANKENPHP_DOCKER_IMAGE=scratch
-        FROM $${FRANKENPHP_DOCKER_IMAGE}
-        ARG FRANKENPHP_PHP_EXTENSIONS=""
-        RUN [ -z "$${FRANKENPHP_PHP_EXTENSIONS}" ] || install-php-extensions $${FRANKENPHP_PHP_EXTENSIONS}
-        ARG username
-        ARG uid
-        ARG gid
-        RUN <<EOF
-          set -eu -o pipefail
-          getent group tty || groupadd tty
-          (groupadd --gid $$gid "$$username" || groupadd "$$username" || true) && (useradd -G tty -l -m -s "/bin/bash" --gid "$$username" --comment '' --uid $$uid "$$username" || useradd -G tty -l -m -s "/bin/bash" --gid "$$username" --comment '' "$$username" || useradd  -G tty -l -m -s "/bin/bash" --gid "$$gid" --comment '' "$$username" || useradd -G tty -l -m -s "/bin/bash" --comment '' $$username )
-          setcap -r /usr/local/bin/frankenphp
-          chown -R $${username}:$${username} /data/caddy /config/caddy
-        EOF
-        ARG FRANKENPHP_XDEBUG=false
-        RUN <<EOF
-          set -eu -o pipefail
-          if [ "$${FRANKENPHP_XDEBUG}" = "true" ]; then
-            install-php-extensions xdebug
-            {
-              echo "zend_extension=xdebug.so";
-              echo "xdebug.client_host=host.docker.internal";
-              echo "xdebug.discover_client_host=1";
-              echo "xdebug.client_port=9003";
-              echo "xdebug.mode=debug,develop";
-              echo "xdebug.start_with_request=yes";
-              echo "xdebug.max_nesting_level=1000";
-            } > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini;
-          fi
-        EOF
-        USER $${username}
+      context: frankenphp
       args:
         FRANKENPHP_DOCKER_IMAGE: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}
         FRANKENPHP_PHP_EXTENSIONS: ${FRANKENPHP_PHP_EXTENSIONS:-}
