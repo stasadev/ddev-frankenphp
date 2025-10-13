@@ -104,6 +104,14 @@ health_checks() {
     assert_output "FrankenPHP page without worker"
   fi
 
+  run ddev exec -s frankenphp curl -sf https://${PROJNAME}.ddev.site
+  assert_success
+  if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
+    assert_output --partial "FrankenPHP Worker Demo"
+  else
+    assert_output "FrankenPHP page without worker"
+  fi
+
   run curl -sf http://${PROJNAME}.ddev.site
   assert_success
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then

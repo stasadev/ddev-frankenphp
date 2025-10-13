@@ -27,3 +27,7 @@ services:
       - "./php:/usr/local/etc/php/ddev.conf.d"
       - ".:/mnt/ddev_config"
       - "ddev-global-cache:/mnt/ddev-global-cache"
+    post_start:
+      - command: mkcert -install
+    external_links:
+      - ddev-router:${DDEV_SITENAME}.${DDEV_TLD}
