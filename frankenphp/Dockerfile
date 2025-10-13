@@ -4,11 +4,6 @@ FROM ${FRANKENPHP_DOCKER_IMAGE}
 
 SHELL ["/bin/bash", "-eu", "-o", "pipefail", "-c"]
 
-# Install PHP extensions provided by user
-# Always install xdebug, but disable it by default
-ARG FRANKENPHP_PHP_EXTENSIONS=""
-RUN install-php-extensions xdebug ${FRANKENPHP_PHP_EXTENSIONS} && rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-
 # Add a new user and give it ownership of frankenphp related files
 ARG username
 ARG uid
@@ -19,6 +14,22 @@ RUN <<EOF
     setcap -r /usr/local/bin/frankenphp
     chown -R ${username}:${username} /data/caddy /config/caddy
 EOF
+
+RUN (apt-get update || true) && apt-get install -y --no-install-recommends sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# CAROOT for `mkcert` to use, has the CA config
+ENV CAROOT=/mnt/ddev-global-cache/mkcert
+# Give the `${username}` user full `sudo` privileges
+RUN mkdir -p /etc/sudoers.d && echo "${username} ALL=(ALL) NOPASSWD: ALL" >> "/etc/sudoers.d/${username}" && chmod 0440 "/etc/sudoers.d/${username}"
+# Install the correct architecture binary of `mkcert`
+ARG TARGETARCH
+RUN mkdir -p /usr/local/bin && curl --fail -JL -s -o /usr/local/bin/mkcert "https://dl.filippo.io/mkcert/latest?for=linux/${TARGETARCH}" && chmod +x /usr/local/bin/mkcert
+
+# Install PHP extensions provided by user
+# Always install xdebug, but disable it by default
+ARG FRANKENPHP_PHP_EXTENSIONS=""
+RUN install-php-extensions xdebug ${FRANKENPHP_PHP_EXTENSIONS} && rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Enable xdebug on demand with custom DDEV config
 ARG FRANKENPHP_XDEBUG=false
