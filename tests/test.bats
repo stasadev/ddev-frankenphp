@@ -205,7 +205,7 @@ teardown() {
   health_checks
 }
 
-# bats test_tags=php8.4
+# bats test_tags=php84
 @test "install from directory php8.4" {
   set -eu -o pipefail
 

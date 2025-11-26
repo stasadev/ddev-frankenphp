@@ -34,7 +34,7 @@ jobs:
         bats_tag: [
           "default",
           "xdebug",
-          "php8.4",
+          "php84",
           "worker",
           "wrong-webserver",
           "docroot-public-and-redis",
