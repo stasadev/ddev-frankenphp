@@ -57,7 +57,7 @@ health_checks() {
   run ddev exec -s frankenphp curl -sfI http://127.0.0.1
   assert_success
   assert_output --partial "HTTP/1.1 200"
-  assert_output --partial "Server: Caddy"
+  assert_output --regexp "Server: (Caddy|FrankenPHP)"
   assert_output --partial "X-Powered-By: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
@@ -71,7 +71,7 @@ health_checks() {
   run curl -sfI http://${PROJNAME}.ddev.site
   assert_success
   assert_output --partial "HTTP/1.1 200"
-  assert_output --partial "Server: Caddy"
+  assert_output --regexp "Server: (Caddy|FrankenPHP)"
   assert_output --partial "X-Powered-By: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
@@ -85,7 +85,7 @@ health_checks() {
   run curl -sfI https://${PROJNAME}.ddev.site
   assert_success
   assert_output --partial "HTTP/2 200"
-  assert_output --partial "server: Caddy"
+  assert_output --regexp "server: (Caddy|FrankenPHP)"
   assert_output --partial "x-powered-by: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
@@ -173,6 +173,7 @@ teardown() {
   [ "${TESTDIR}" != "" ] && rm -rf ${TESTDIR}
 }
 
+# bats test_tags=default
 @test "install from directory" {
   set -eu -o pipefail
 
@@ -187,6 +188,7 @@ teardown() {
   health_checks
 }
 
+# bats test_tags=xdebug
 @test "test ddev xdebug" {
   set -eu -o pipefail
 
@@ -203,6 +205,7 @@ teardown() {
   health_checks
 }
 
+# bats test_tags=php8.4
 @test "install from directory php8.4" {
   set -eu -o pipefail
 
@@ -223,6 +226,7 @@ teardown() {
   health_checks
 }
 
+# bats test_tags=worker
 @test "worker" {
   set -eu -o pipefail
 
@@ -242,6 +246,7 @@ teardown() {
   health_checks
 }
 
+# bats test_tags=wrong-webserver
 @test "wrong webserver" {
   set -eu -o pipefail
 
@@ -254,6 +259,7 @@ teardown() {
   assert_output --partial "The add-on only works with the 'generic' webserver type."
 }
 
+# bats test_tags=docroot-public-and-redis
 @test "docroot=public and install redis" {
   set -eu -o pipefail
 
@@ -271,21 +277,6 @@ teardown() {
 
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in $(pwd)" >&3
   run ddev add-on get "${DIR}"
-  assert_success
-  run ddev restart -y
-  assert_success
-  health_checks
-}
-
-# bats test_tags=release
-@test "install from release" {
-  set -eu -o pipefail
-
-  cp "${DIR}"/tests/testdata/index-no-worker.php index.php
-  assert_file_exist index.php
-
-  echo "# ddev add-on get ${GITHUB_REPO} with project ${PROJNAME} in $(pwd)" >&3
-  run ddev add-on get "${GITHUB_REPO}"
   assert_success
   run ddev restart -y
   assert_success

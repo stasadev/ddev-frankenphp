@@ -31,6 +31,14 @@ jobs:
     strategy:
       matrix:
         ddev_version: [stable, HEAD]
+        bats_tag: [
+          "default",
+          "xdebug",
+          "php8.4",
+          "worker",
+          "wrong-webserver",
+          "docroot-public-and-redis",
+        ]
       fail-fast: false
 
     runs-on: ubuntu-latest
