@@ -219,7 +219,7 @@ teardown() {
   health_checks
 }
 
-# bats test_tags=worker
+# bats test_tags=php84-worker
 @test "php84-worker" {
   set -eu -o pipefail
 

@@ -82,7 +82,7 @@ To modify the default [Caddyfile](https://github.com/php/frankenphp/blob/main/ca
 # See all configurable variables in
 # https://github.com/php/frankenphp/blob/main/caddy/frankenphp/Caddyfile
 services:
-  frankenphp:
+  web:
     environment:
       # enable worker script
       # change some php.ini settings
