@@ -1,7 +1,7 @@
 [![add-on registry](https://img.shields.io/badge/DDEV-Add--on_Registry-blue)](https://addons.ddev.com)
-[![tests](https://github.com/stasadev/ddev-frankenphp/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/stasadev/ddev-frankenphp/actions/workflows/tests.yml?query=branch%3Amain)
-[![last commit](https://img.shields.io/github/last-commit/stasadev/ddev-frankenphp)](https://github.com/stasadev/ddev-frankenphp/commits)
-[![release](https://img.shields.io/github/v/release/stasadev/ddev-frankenphp)](https://github.com/stasadev/ddev-frankenphp/releases/latest)
+[![tests](https://github.com/ddev/ddev-frankenphp/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/ddev/ddev-frankenphp/actions/workflows/tests.yml?query=branch%3Amain)
+[![last commit](https://img.shields.io/github/last-commit/ddev/ddev-frankenphp)](https://github.com/ddev/ddev-frankenphp/commits)
+[![release](https://img.shields.io/github/v/release/ddev/ddev-frankenphp)](https://github.com/ddev/ddev-frankenphp/releases/latest)
 
 # DDEV FrankenPHP
 
@@ -28,7 +28,7 @@ Note: building extensions slows down the first `ddev start`.
 ## Installation
 
 ```bash
-ddev add-on get stasadev/ddev-frankenphp
+ddev add-on get ddev/ddev-frankenphp
 ddev restart
 ```
 
@@ -110,4 +110,6 @@ All customization options (use with caution):
 
 ## Credits
 
-**Contributed and maintained by [@stasadev](https://github.com/stasadev)**
+**Contributed by [@stasadev](https://github.com/stasadev)**
+
+**Maintained by the [DDEV team](https://ddev.com/support-ddev/)**
