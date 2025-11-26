@@ -11,14 +11,23 @@ See the blog [Using FrankenPHP with DDEV](https://ddev.com/blog/using-frankenphp
 
 [FrankenPHP](https://frankenphp.dev/) is a modern application server for PHP built on top of the [Caddy](https://caddyserver.com/) web server.
 
-This add-on integrates FrankenPHP into your [DDEV](https://ddev.com/) project as an extra service.
+This add-on integrates FrankenPHP into your [DDEV](https://ddev.com/) project.
 
-Running it as a separate service lets you install additional PHP extensions. This differs from the [official quckstart](https://ddev.readthedocs.io/en/stable/users/quickstart/#generic-frankenphp), which bundles a static FrankenPHP build inside the `web` container.
+Difference from the [official quckstart](https://ddev.readthedocs.io/en/stable/users/quickstart/#generic-frankenphp):
+
+| Feature | This Add-on | Official Quickstart |
+| ------- | ----------- | ------------------- |
+| **PHP Versions** | PHP 8.2, 8.3, 8.4, 8.5 | PHP 8.4 only |
+| **PHP Extensions** | Builds on demand (slower, flexible) | Prebuilt (faster, limited) |
+| **Configuration** | Supports custom FrankenPHP options | No custom options support |
+| **Worker Mode** | ✓ Supported | ✗ Not supported |
+| **Developer Tools** | `ddev xdebug`, `ddev xhprof`, `ddev xhgui` | ✗ Not available |
+
+Note: building extensions slows down the first `ddev start`.
 
 ## Installation
 
 ```bash
-ddev config --webserver-type=generic
 ddev add-on get stasadev/ddev-frankenphp
 ddev restart
 ```
@@ -29,40 +38,41 @@ After installation, make sure to commit the `.ddev` directory to version control
 
 | Command | Description |
 | ------- | ----------- |
-| `ddev describe` | View service status and ports used by FrankenPHP |
-| `ddev php` | Run PHP in the FrankenPHP container |
-| `ddev xdebug on` | Enable Xdebug in the FrankenPHP container |
-| `ddev xdebug off` | Disable Xdebug in the FrankenPHP container |
-| `ddev exec -s frankenphp bash` | Enter the FrankenPHP container |
-| `ddev logs -s frankenphp -f` | View FrankenPHP logs |
-
-## Caveats
-
-- `ddev xhprof` and `ddev xhgui` are only designed to work in the `web` container, it won't work here.
+| `ddev describe` | View project status |
+| `ddev logs -f` | View FrankenPHP logs |
 
 ## Advanced Customization
-
-To change the Docker image:
-
-```bash
-ddev dotenv set .ddev/.env.frankenphp --frankenphp-docker-image="dunglas/frankenphp:php8.3"
-ddev add-on get stasadev/ddev-frankenphp
-ddev stop && ddev debug rebuild -s frankenphp && ddev start
-```
-
-Make sure to commit the `.ddev/.env.frankenphp` file to version control.
-
----
 
 To add PHP extensions (see supported extensions [here](https://github.com/mlocati/docker-php-extension-installer?tab=readme-ov-file#supported-php-extensions)):
 
 ```bash
-ddev dotenv set .ddev/.env.frankenphp --frankenphp-php-extensions="redis pdo_mysql"
-ddev add-on get stasadev/ddev-frankenphp
-ddev stop && ddev debug rebuild -s frankenphp && ddev start
+ddev dotenv set .ddev/.env.web --frankenphp-custom-extensions="psr solr"
+ddev stop && ddev debug rebuild && ddev start
 ```
 
-Make sure to commit the `.ddev/.env.frankenphp` file to version control.
+Make sure to commit the `.ddev/.env.web` file to version control.
+
+---
+
+If you want to override the default set of extensions, for example, to remove some extensions to make the first build faster:
+
+```bash
+ddev dotenv set .ddev/.env.web --frankenphp-default-extensions="gd pdo_mysql xdebug xhprof"
+ddev stop && ddev debug rebuild && ddev start
+```
+
+Make sure to commit the `.ddev/.env.web` file to version control.
+
+---
+
+If you're using the current DDEV HEAD:
+
+```bash
+ddev dotenv set .ddev/.env.web --frankenphp-debian-codename="trixie"
+ddev stop && ddev debug rebuild && ddev start
+```
+
+Make sure to commit the `.ddev/.env.web` file to version control.
 
 ---
 
@@ -95,8 +105,9 @@ All customization options (use with caution):
 
 | Variable | Flag | Default |
 | -------- | ---- | ------- |
-| `FRANKENPHP_DOCKER_IMAGE` | `--frankenphp-docker-image` | `dunglas/frankenphp:php8.3` |
-| `FRANKENPHP_PHP_EXTENSIONS` | `--frankenphp-php-extensions` | (not set) |
+| `FRANKENPHP_DEBIAN_CODENAME` | `--frankenphp-debian-codename` | `bookworm` |
+| `FRANKENPHP_DEFAULT_EXTENSIONS` | `--frankenphp-default-extensions` | `gd pdo_mysql pdo_pgsql xdebug xhprof zip` |
+| `FRANKENPHP_CUSTOM_EXTENSIONS` | `--frankenphp-custom-extensions` | (not set) |
 
 ## Resources:
 

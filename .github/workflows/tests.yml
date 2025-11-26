@@ -32,12 +32,12 @@ jobs:
       matrix:
         ddev_version: [stable, HEAD]
         bats_tag: [
-          "default",
-          "xdebug",
+          "php82",
+          "php83",
           "php84",
-          "worker",
-          "wrong-webserver",
-          "docroot-public-and-redis",
+          "php85",
+          "php84-worker",
+          "php84-docroot-and-extension",
         ]
       fail-fast: false
 

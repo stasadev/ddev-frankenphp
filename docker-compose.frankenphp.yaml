@@ -1,33 +1,12 @@
 #ddev-generated
 services:
-  frankenphp:
-    container_name: ddev-${DDEV_SITENAME}-frankenphp
-    hostname: ${DDEV_SITENAME}-frankenphp
-    image: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}-${DDEV_SITENAME}-built
+  web:
+    image: ${DDEV_WEBIMAGE}-${DDEV_SITENAME}-built
     build:
-      context: frankenphp
       args:
-        FRANKENPHP_DOCKER_IMAGE: ${FRANKENPHP_DOCKER_IMAGE:-dunglas/frankenphp:php8.3}
-        FRANKENPHP_PHP_EXTENSIONS: ${FRANKENPHP_PHP_EXTENSIONS:-}
-        FRANKENPHP_XDEBUG: ${FRANKENPHP_XDEBUG:-false}
-        username: ${DDEV_USER}
-        uid: ${DDEV_UID}
-        gid: ${DDEV_GID}
-    labels:
-      com.ddev.site-name: ${DDEV_SITENAME}
-      com.ddev.approot: ${DDEV_APPROOT}
+        FRANKENPHP_DEBIAN_CODENAME: ${FRANKENPHP_DEBIAN_CODENAME:-bookworm}
+        FRANKENPHP_DEFAULT_EXTENSIONS: ${FRANKENPHP_DEFAULT_EXTENSIONS-gd pdo_mysql pdo_pgsql xdebug xhprof zip}
+        FRANKENPHP_CUSTOM_EXTENSIONS: ${FRANKENPHP_CUSTOM_EXTENSIONS:-}
     environment:
-      - PHP_INI_SCAN_DIR=:/usr/local/etc/php/ddev.conf.d
       - SERVER_NAME=:80
       - SERVER_ROOT=${DDEV_DOCROOT:-.}
-      - USER=${DDEV_USER}
-    working_dir: /var/www/html
-    volumes:
-      - "../:/var/www/html"
-      - "./php:/usr/local/etc/php/ddev.conf.d"
-      - ".:/mnt/ddev_config"
-      - "ddev-global-cache:/mnt/ddev-global-cache"
-    post_start:
-      - command: mkcert -install
-    external_links:
-      - ddev-router:${DDEV_SITENAME}.${DDEV_TLD}

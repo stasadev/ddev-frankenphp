@@ -13,7 +13,6 @@
 <!-- If this PR changes logic, consider adding additional steps or context to the instructions below. -->
 
 ```bash
-ddev config --webserver-type=generic
 ddev add-on get https://github.com/stasadev/ddev-frankenphp/tarball/refs/pull/REPLACE_ME_WITH_THIS_PR_NUMBER/head
 ddev restart
 ```
