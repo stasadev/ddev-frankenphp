@@ -34,6 +34,10 @@ ddev restart
 
 After installation, make sure to commit the `.ddev` directory to version control.
 
+### Debian Codename Detection
+
+If you have switched to DDEV HEAD (upcoming v1.25.0+), repeat the installation to get the updated configuration in the `.ddev/.env.web` file.
+
 ## Usage
 
 | Command | Description |
@@ -58,17 +62,6 @@ If you want to override the default set of extensions, for example, to remove so
 
 ```bash
 ddev dotenv set .ddev/.env.web --frankenphp-default-extensions="gd pdo_mysql xdebug xhprof"
-ddev stop && ddev debug rebuild && ddev start
-```
-
-Make sure to commit the `.ddev/.env.web` file to version control.
-
----
-
-If you're using the current DDEV HEAD:
-
-```bash
-ddev dotenv set .ddev/.env.web --frankenphp-debian-codename="trixie"
 ddev stop && ddev debug rebuild && ddev start
 ```
 

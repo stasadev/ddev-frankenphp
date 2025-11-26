@@ -20,4 +20,12 @@ pre_install_actions:
       fi
     done
 
+post_install_actions:
+  - |
+    #ddev-description:Detecting Debian codename for FrankenPHP image build
+    debian_codename=$(docker run --rm "$(ddev version -j 2>/dev/null | docker run --rm -i ddev/ddev-utilities jq -r .raw.web 2>/dev/null)" bash -c 'source /etc/os-release && echo $VERSION_CODENAME' 2>/dev/null)
+    if [ "${debian_codename}" != "" ]; then
+      ddev dotenv set .ddev/.env.web --frankenphp-debian-codename="${debian_codename}"
+    fi
+
 ddev_version_constraint: '>= v1.24.10'

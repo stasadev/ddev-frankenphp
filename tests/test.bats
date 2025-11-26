@@ -39,11 +39,6 @@ setup() {
   export FRANKENPHP_PHP_VERSION=8.4
   export FRANKENPHP_WORKER=false
   export FRANKENPHP_CUSTOM_EXTENSIONS=""
-
-  if [[ "$(ddev --version)" != "ddev version v1.24.10" ]]; then
-    run ddev dotenv set .ddev/.env.web --frankenphp-debian-codename="trixie"
-    assert_success
-  fi
 }
 
 health_checks() {
