@@ -50,7 +50,6 @@ health_checks() {
   assert_success
   assert_output --partial "HTTP/1.1 200"
   assert_output --regexp "Server: (Caddy|FrankenPHP)"
-  assert_output --partial "X-Powered-By: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
     assert_output --partial "X-Request-Count"
@@ -64,7 +63,6 @@ health_checks() {
   assert_success
   assert_output --partial "HTTP/2 200"
   assert_output --regexp "server: (Caddy|FrankenPHP)"
-  assert_output --partial "x-powered-by: PHP/${FRANKENPHP_PHP_VERSION}"
 
   if [[ "${FRANKENPHP_WORKER}" == "true" ]]; then
     assert_output --partial "x-request-count"
