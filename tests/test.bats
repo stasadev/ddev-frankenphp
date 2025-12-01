@@ -36,6 +36,9 @@ setup() {
   run ddev config --project-name="${PROJNAME}" --project-tld=ddev.site
   assert_success
 
+  cp "${DIR}"/tests/testdata/.ddev/php/php.ini .ddev/php/php.ini
+  assert_file_exist .ddev/php/php.ini
+
   export FRANKENPHP_PHP_VERSION=8.4
   export FRANKENPHP_WORKER=false
   export FRANKENPHP_CUSTOM_EXTENSIONS=""
@@ -45,6 +48,15 @@ health_checks() {
   run ddev php -v
   assert_success
   assert_output --partial "PHP ${FRANKENPHP_PHP_VERSION}"
+
+  run ddev php --ini
+  assert_success
+  assert_output --partial "/usr/local/etc/php/php.ini"
+  assert_output --partial "/etc/frankenphp/php.d"
+
+  run ddev php -i
+  assert_success
+  assert_output --partial "date.timezone => Europe/London"
 
   run curl -sfI http://${PROJNAME}.ddev.site
   assert_success
@@ -222,7 +234,7 @@ teardown() {
   cp "${DIR}"/tests/testdata/index-worker.php index.php
   assert_file_exist index.php
 
-  cp "${DIR}"/tests/testdata/docker-compose.frankenphp_extra.yaml .ddev/docker-compose.frankenphp_extra.yaml
+  cp "${DIR}"/tests/testdata/.ddev/docker-compose.frankenphp_extra.yaml .ddev/docker-compose.frankenphp_extra.yaml
   assert_file_exist .ddev/docker-compose.frankenphp_extra.yaml
 
   run ddev config --php-version=${FRANKENPHP_PHP_VERSION}
